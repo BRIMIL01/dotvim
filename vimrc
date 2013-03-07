@@ -86,6 +86,9 @@ set winminheight=5
 " The shell to use when using :!
 set shell=zsh
 
+" set tags location
+set tags=./tags;
+
 " Prevent Vim from clobbering the scrollback buffer. See
 " http://www.shallowsky.com/linux/noaltscreen.html
 set t_ti= t_te=
