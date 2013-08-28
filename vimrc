@@ -157,6 +157,11 @@ augroup vimrcEx
 
   autocmd BufRead *.mkd  set ai formatoptions=tcroqn2 comments=n:&gt;
   autocmd BufRead *.markdown  set ai formatoptions=tcroqn2 comments=n:&gt;
+  
+  " Enable syntax highlighting for all spec files
+  " http://stackoverflow.com/questions/8848896/why-do-i-get-syntax-highlighting-for-rspec-only-in-some-projects-in-vim
+  autocmd BufRead *_spec.rb syn keyword rubyRspec describe context it specify it_should_behave_like before after setup subject its shared_examples_for shared_context let 
+  highlight def link rubyRspec Function
 
   " Before writing a file check if the path for it exists. If it doesn't then
   " mkdir -p the path so that the file can be saved.
