@@ -129,10 +129,20 @@ let mapleader = ","
 filetype plugin indent on
 
 " tab completion mode for files, etc.
-set wildmode=longest,list
+set wildmode=list:longest,list:full
+
+" scan current buffer, buffers of other windows, loaded buffers in buffer
+" list, unloaded buffers, tags
+set complete=.,w,b,u,t
+
+" enable menu and extra info about completion
+set completeopt=menu,preview
 
 " make tab completion for files/buffers act like bash
 set wildmenu
+
+" set ack.vim to use ag instead of ack
+let g:ackprg = 'ag --nogroup --nocolor --column'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CUSTOM AUTOCMDS
@@ -193,17 +203,23 @@ augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " COLOR
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" set background=light
+" colorscheme scott
+
 " Tell it to use the solarized color scheme
 " http://ethanschoonover.com/solarized
 " In order to have this work properly in iTerm2 you also need to setup the
 " iTerm2 solarized color scheme.
-set background=dark
-colorscheme solarized
+" set background=dark
+" colorscheme solarized
 
 " Tell it to use the ir_black color scheme
 " http://blog.toddwerth.com/entries/8
 " set background=dark
 " colorscheme ir_black
+
+set background=dark
+colorscheme jellybeans
 
 " set background=dark
 " colorscheme herald
@@ -238,6 +254,10 @@ imap <c-c> <esc>
 " Clear the search buffer when hitting return
 :nnoremap <CR> :nohlsearch<cr>
 nnoremap <leader><leader> <c-^>
+
+" make pasting correctly from system clip board easier.
+map <leader>p :set paste<CR>^"+p:set nopaste<CR>
+map <leader>P :set paste<CR>^"+P:set nopaste<CR>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -343,4 +363,4 @@ map <leader>c :call RunAllCucumberFeatures()<cr>
 map <leader>w :call RunWipCucumberFeatures()<cr>
 
 " Ping the cursor like an old radar to find it fast
-nnoremap <leader>p :PingCursor<cr>
+nnoremap <leader>C :PingCursor<cr>
