@@ -211,7 +211,7 @@ augroup END
 " In order to have this work properly in iTerm2 you also need to setup the
 " iTerm2 solarized color scheme.
 " set background=dark
-" colorscheme solarized
+colorscheme solarized
 
 " Tell it to use the ir_black color scheme
 " http://blog.toddwerth.com/entries/8
@@ -219,7 +219,7 @@ augroup END
 " colorscheme ir_black
 
 set background=dark
-colorscheme jellybeans
+" colorscheme jellybeans
 
 " set background=dark
 " colorscheme herald
@@ -263,33 +263,33 @@ map <leader>P :set paste<CR>^"+P:set nopaste<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " MAPS TO JUMP TO SPECIFIC CtrlP TARGETS AND FILES
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-map <leader>gr :topleft :split config/routes.rb<cr>
-function! ShowRoutes()
-  " Requires 'scratch' plugin
-  :topleft 100 :split __Routes__
-  " Make sure Vim doesn't write __Routes__ as a file
-  :set buftype=nofile
-  " Delete everything
-  :normal 1GdG
-  " Put routes output in buffer
-  :0r! rake -s routes
-  " Size window to number of lines (1 plus rake output length)
-  :exec ":normal " . line("$") . _ "
-  " Move cursor to bottom
-  :normal 1GG
-  " Delete empty trailing line
-  :normal dd
-endfunction
-map <leader>gR :call ShowRoutes()<cr>
-map <leader>gv :CtrlP app/views<cr>
-map <leader>gc :CtrlP app/controllers<cr>
-map <leader>gm :CtrlP app/models<cr>
-map <leader>gh :CtrlP app/helpers<cr>
-map <leader>gl :CtrlP lib<cr>
-map <leader>gp :CtrlP public<cr>
-map <leader>gs :CtrlP public/stylesheets/sass<cr>
-map <leader>gf :CtrlP features<cr>
-map <leader>gg :topleft 100 :split Gemfile<cr>
+" map <leader>gr :topleft :split config/routes.rb<cr>
+" function! ShowRoutes()
+"   " Requires 'scratch' plugin
+"   :topleft 100 :split __Routes__
+"   " Make sure Vim doesn't write __Routes__ as a file
+"   :set buftype=nofile
+"   " Delete everything
+"   :normal 1GdG
+"   " Put routes output in buffer
+"   :0r! rake -s routes
+"   " Size window to number of lines (1 plus rake output length)
+"   :exec ":normal " . line("$") . _ "
+"   " Move cursor to bottom
+"   :normal 1GG
+"   " Delete empty trailing line
+"   :normal dd
+" endfunction
+" map <leader>gR :call ShowRoutes()<cr>
+" map <leader>gv :CtrlP app/views<cr>
+" map <leader>gc :CtrlP app/controllers<cr>
+" map <leader>gm :CtrlP app/models<cr>
+" map <leader>gh :CtrlP app/helpers<cr>
+" map <leader>gl :CtrlP lib<cr>
+" map <leader>gp :CtrlP public<cr>
+" map <leader>gs :CtrlP public/stylesheets/sass<cr>
+" map <leader>gf :CtrlP features<cr>
+" map <leader>gg :topleft 100 :split Gemfile<cr>
 map <leader>gt :CtrlPTag<cr>
 map <leader>f :CtrlP .<cr>
 map <leader>F :CtrlP %%<cr>
