@@ -22,8 +22,15 @@ set gfn=Monaco:h15
 set nocompatible
 
 " show line numbers
+set relativenumber
 set number
 set ruler
+
+" set regexp engine to old one full featured one. Turns out that the newer NFA
+" regexp engine does NOT play nice with Ruby lang syntax highlighting.
+" Switching to the older non NFA regexp engine drastically increases
+" performance.
+set regexpengine=1
 
 " keep buffers opened in background until :q or :q!
 set hidden
@@ -34,6 +41,10 @@ set history=10000
 " Set the word wrap character limit, this will force word wrap past the
 " specified column.
 set textwidth=78
+
+" Set the visual color column. This is usually used to indicate the text wrap
+" boundaries.
+" set colorcolumn=79
 
 " Default to tab size of two spaces and enable auto indent
 set expandtab
@@ -183,7 +194,9 @@ augroup vimrcEx
   " autocmd FileType html,eruby if g:html_indent_tags !~ '\\|p\>' | let g:html_indent_tags .= '\|p\|li\|dt\|dd' | endif
 
   " Don't syntax highlight markdown because it's often wrong
-  autocmd! FileType mkd setlocal syn=off
+  " autocmd! FileType mkd setlocal syn=off
+  autocmd! FileType mkd setlocal spell
+  autocmd! FileType gitcommit setlocal spell
 
   " Don't screw up folds when inserting text that might affect them, until
   " " leaving insert mode. Foldmethod is local to the window. Protect against
@@ -203,6 +216,7 @@ augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " COLOR
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 " set background=light
 " colorscheme scott
 
@@ -210,7 +224,7 @@ augroup END
 " http://ethanschoonover.com/solarized
 " In order to have this work properly in iTerm2 you also need to setup the
 " iTerm2 solarized color scheme.
-" set background=dark
+set background=dark
 colorscheme solarized
 
 " Tell it to use the ir_black color scheme
@@ -218,11 +232,17 @@ colorscheme solarized
 " set background=dark
 " colorscheme ir_black
 
-set background=dark
+" set background=dark
 " colorscheme jellybeans
 
 " set background=dark
+" colorscheme xoria256
+
+" set background=dark
 " colorscheme herald
+
+" set background=dark
+" colorscheme grb256
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " STATUS LINE
@@ -261,39 +281,71 @@ map <leader>P :set paste<CR>^"+P:set nopaste<CR>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" MAPS TO JUMP TO SPECIFIC CtrlP TARGETS AND FILES
+" MAPS TO JUMP TO SPECIFIC TARGETS AND FILES
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" map <leader>gr :topleft :split config/routes.rb<cr>
-" function! ShowRoutes()
-"   " Requires 'scratch' plugin
-"   :topleft 100 :split __Routes__
-"   " Make sure Vim doesn't write __Routes__ as a file
-"   :set buftype=nofile
-"   " Delete everything
-"   :normal 1GdG
-"   " Put routes output in buffer
-"   :0r! rake -s routes
-"   " Size window to number of lines (1 plus rake output length)
-"   :exec ":normal " . line("$") . _ "
-"   " Move cursor to bottom
-"   :normal 1GG
-"   " Delete empty trailing line
-"   :normal dd
-" endfunction
-" map <leader>gR :call ShowRoutes()<cr>
-" map <leader>gv :CtrlP app/views<cr>
-" map <leader>gc :CtrlP app/controllers<cr>
-" map <leader>gm :CtrlP app/models<cr>
-" map <leader>gh :CtrlP app/helpers<cr>
-" map <leader>gl :CtrlP lib<cr>
-" map <leader>gp :CtrlP public<cr>
-" map <leader>gs :CtrlP public/stylesheets/sass<cr>
-" map <leader>gf :CtrlP features<cr>
-" map <leader>gg :topleft 100 :split Gemfile<cr>
-map <leader>gt :CtrlPTag<cr>
-map <leader>f :CtrlP .<cr>
-map <leader>F :CtrlP %%<cr>
-map <leader>b :CtrlPBuffer<cr>
+function! SelectaCommand(choice_command, selecta_args, vim_command)
+  try
+    silent let selection = system(a:choice_command . " | ~/.vim/bin/selecta " . a:selecta_args)
+  catch /Vim:Interrupt/
+    " Swallow the ^C so that the redraw below happens; otherwise there will be
+    " leftovers from selecta on the screen
+    redraw!
+    return
+  endtry
+  redraw!
+  exec a:vim_command . " " . selection
+endfunction
+
+" Find all tags in the tags database, then open the tag that the user selects
+command! SelectaTag :call SelectaCommand("awk '{print $1}' tags | sort -u | grep -v '^!'", "", ":tag")
+
+fu! GetBuffers()
+	let ids = filter(range(1, bufnr('$')), 'empty(getbufvar(v:val, "&bt"))'
+		\ .' && getbufvar(v:val, "&bl")')
+  let bufs = [[], []]
+  for id in ids
+    let bname = bufname(id)
+    let ebname = bname == ''
+    let fname = fnamemodify(ebname ? '['.id.'*No Name]' : bname, ':.')
+    if bname != expand('%')
+      cal add(bufs[ebname], fname)
+    endif
+  endfo
+  retu join(bufs[0] + bufs[1], "\n")
+endf
+
+map <leader>gr :topleft :split config/routes.rb<cr>
+function! ShowRoutes()
+  " Requires 'scratch' plugin
+  :topleft 100 :split __Routes__
+  " Make sure Vim doesn't write __Routes__ as a file
+  :set buftype=nofile
+  " Delete everything
+  :normal 1GdG
+  " Put routes output in buffer
+  :0r! rake -s routes
+  " Size window to number of lines (1 plus rake output length)
+  :exec ":normal " . line("$") . _ "
+  " Move cursor to bottom
+  :normal 1GG
+  " Delete empty trailing line
+  :normal dd
+endfunction
+map <leader>gR :call ShowRoutes()<cr>
+map <leader>gg :topleft 100 :split Gemfile<cr>
+
+map <leader>b :call SelectaCommand("echo '" . GetBuffers() . "'", "", ":buffer")<cr>
+map <leader>gv :call SelectaCommand("find app/views -type f", "", ":e")<cr>
+" map <leader>gc :call SelectaCommand("find app/controllers -type f", "", ":e")<cr>
+map <leader>gm :call SelectaCommand("find app/models -type f", "", ":e")<cr>
+map <leader>gh :call SelectaCommand("find app/helpers -type f", "", ":e")<cr>
+map <leader>gl :call SelectaCommand("find lib -type f", "", ":e")<cr>
+" map <leader>gp :call SelectaCommand("find public -type f", "", ":e")<cr>
+" map <leader>gs :call SelectaCommand("find app/assets/stylesheets -type f", "", ":e")<cr>
+map <leader>gf :call SelectaCommand("find features -type f", "", ":e")<cr>
+" fuzzy-match files except for stuff in tmp/*, log/*, tags
+map <leader>f :call SelectaCommand("find * -path tags -prune -or -path tmp -prune -or -path log -prune -or -path " . expand('%') . " -prune -or -type f -print", "", ":e")<cr>
+map <leader>gt :SelectaTag<cr>
 
 " jump to buffer if already open, even if in another tab
 let g:ctrlp_switch_buffer = 2
@@ -309,6 +361,13 @@ let g:ctrlp_max_height = 20
 let g:ctrlp_custom_ignore = 'tags$\|\.DS_Store$\|\.git$\|_site$'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" GIT SHORTCUTS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+map <leader>gs :Gstatus<cr>
+map <leader>gc :Gcommit<cr>
+map <leader>gp :!git push<cr>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ARROW KEYS ARE UNACCEPTABLE
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map <Left> :echo "no!"<cr>
@@ -320,16 +379,16 @@ map <Down> :echo "no!"<cr>
 " MULTIPURPOSE TAB KEY
 " Indent if we're at the beginning of a line. Else, do completion.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! InsertTabWrapper()
-    let col = col('.') - 1
-    if !col || getline('.')[col - 1] !~ '\k'
-        return "\<tab>"
-    else
-        return "\<c-p>"
-    endif
-endfunction
-inoremap <tab> <c-r>=InsertTabWrapper()<cr>
-inoremap <s-tab> <c-n>
+" function! InsertTabWrapper()
+"     let col = col('.') - 1
+"     if !col || getline('.')[col - 1] !~ '\k'
+"         return "\<tab>"
+"     else
+"         return "\<c-p>"
+"     endif
+" endfunction
+" inoremap <tab> <c-r>=InsertTabWrapper()<cr>
+" inoremap <s-tab> <c-n>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " OPEN FILES IN DIRECTORY OF CURRENT FILE
