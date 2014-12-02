@@ -213,36 +213,16 @@ augroup vimrcEx
   autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
   autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
 augroup END
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " COLOR
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" set background=light
-" colorscheme scott
-
 " Tell it to use the solarized color scheme
 " http://ethanschoonover.com/solarized
 " In order to have this work properly in iTerm2 you also need to setup the
 " iTerm2 solarized color scheme.
 set background=dark
 colorscheme solarized
-
-" Tell it to use the ir_black color scheme
-" http://blog.toddwerth.com/entries/8
-" set background=dark
-" colorscheme ir_black
-
-" set background=dark
-" colorscheme jellybeans
-
-" set background=dark
-" colorscheme xoria256
-
-" set background=dark
-" colorscheme herald
-
-" set background=dark
-" colorscheme grb256
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " STATUS LINE
@@ -258,17 +238,7 @@ nnoremap <c-j> <c-w>j
 nnoremap <c-k> <c-w>k
 nnoremap <c-h> <c-w>h
 nnoremap <c-l> <c-w>l
-" Insert a hash rocket with <c-l>
-imap <c-l> <space>=><space>
 
-" Erb statement generators
-nmap <leader>- i<%<space><space>-%><esc>bhi
-nmap <leader>= i<%=<space><space>%><esc>bhi
-imap <leader>- <%<space><space>-%><esc>bhi
-imap <leader>= <%=<space><space>%><esc>bhi
-
-"imap <c-n> <%<space><space>%><esc>bhi
-"imap <c-r> <%=<space><space>%><esc>bhi
 " Can't be bothered to understand ESC vs <c-c> in insert mode
 imap <c-c> <esc>
 " Clear the search buffer when hitting return
@@ -314,38 +284,10 @@ fu! GetBuffers()
   retu join(bufs[0] + bufs[1], "\n")
 endf
 
-map <leader>gr :topleft :split config/routes.rb<cr>
-function! ShowRoutes()
-  " Requires 'scratch' plugin
-  :topleft 100 :split __Routes__
-  " Make sure Vim doesn't write __Routes__ as a file
-  :set buftype=nofile
-  " Delete everything
-  :normal 1GdG
-  " Put routes output in buffer
-  :0r! rake -s routes
-  " Size window to number of lines (1 plus rake output length)
-  :exec ":normal " . line("$") . _ "
-  " Move cursor to bottom
-  :normal 1GG
-  " Delete empty trailing line
-  :normal dd
-endfunction
-map <leader>gR :call ShowRoutes()<cr>
-map <leader>gg :topleft 100 :split Gemfile<cr>
-
-map <leader>b :call SelectaCommand("echo '" . GetBuffers() . "'", "", ":buffer")<cr>
-map <leader>gv :call SelectaCommand("find app/views -type f", "", ":e")<cr>
-" map <leader>gc :call SelectaCommand("find app/controllers -type f", "", ":e")<cr>
-map <leader>gm :call SelectaCommand("find app/models -type f", "", ":e")<cr>
-map <leader>gh :call SelectaCommand("find app/helpers -type f", "", ":e")<cr>
-map <leader>gl :call SelectaCommand("find lib -type f", "", ":e")<cr>
-" map <leader>gp :call SelectaCommand("find public -type f", "", ":e")<cr>
-" map <leader>gs :call SelectaCommand("find app/assets/stylesheets -type f", "", ":e")<cr>
-map <leader>gf :call SelectaCommand("find features -type f", "", ":e")<cr>
-" fuzzy-match files except for stuff in tmp/*, log/*, tags
-map <leader>f :call SelectaCommand("find * -path tags -prune -or -path tmp -prune -or -path log -prune -or -path " . expand('%') . " -prune -or -type f -print", "", ":e")<cr>
-map <leader>gt :SelectaTag<cr>
+map <leader>gt :CtrlPTag<cr>
+map <leader>f :CtrlP .<cr>
+map <leader>F :CtrlP %%<cr>
+map <leader>b :CtrlPBuffer<cr>
 
 " jump to buffer if already open, even if in another tab
 let g:ctrlp_switch_buffer = 2
@@ -374,21 +316,6 @@ map <Left> :echo "no!"<cr>
 map <Right> :echo "no!"<cr>
 map <Up> :echo "no!"<cr>
 map <Down> :echo "no!"<cr>
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" MULTIPURPOSE TAB KEY
-" Indent if we're at the beginning of a line. Else, do completion.
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" function! InsertTabWrapper()
-"     let col = col('.') - 1
-"     if !col || getline('.')[col - 1] !~ '\k'
-"         return "\<tab>"
-"     else
-"         return "\<c-p>"
-"     endif
-" endfunction
-" inoremap <tab> <c-r>=InsertTabWrapper()<cr>
-" inoremap <s-tab> <c-n>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " OPEN FILES IN DIRECTORY OF CURRENT FILE
@@ -421,5 +348,4 @@ map <leader>a :call RunAllRSpecTests()<cr>
 map <leader>c :call RunAllCucumberFeatures()<cr>
 map <leader>w :call RunWipCucumberFeatures()<cr>
 
-" Ping the cursor like an old radar to find it fast
-nnoremap <leader>C :PingCursor<cr>
+let g:airline#extensions#tabline#enabled = 1
