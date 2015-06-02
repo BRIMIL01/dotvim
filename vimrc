@@ -253,37 +253,6 @@ map <leader>P :set paste<CR>^"+P:set nopaste<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " MAPS TO JUMP TO SPECIFIC TARGETS AND FILES
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! SelectaCommand(choice_command, selecta_args, vim_command)
-  try
-    silent let selection = system(a:choice_command . " | ~/.vim/bin/selecta " . a:selecta_args)
-  catch /Vim:Interrupt/
-    " Swallow the ^C so that the redraw below happens; otherwise there will be
-    " leftovers from selecta on the screen
-    redraw!
-    return
-  endtry
-  redraw!
-  exec a:vim_command . " " . selection
-endfunction
-
-" Find all tags in the tags database, then open the tag that the user selects
-command! SelectaTag :call SelectaCommand("awk '{print $1}' tags | sort -u | grep -v '^!'", "", ":tag")
-
-fu! GetBuffers()
-	let ids = filter(range(1, bufnr('$')), 'empty(getbufvar(v:val, "&bt"))'
-		\ .' && getbufvar(v:val, "&bl")')
-  let bufs = [[], []]
-  for id in ids
-    let bname = bufname(id)
-    let ebname = bname == ''
-    let fname = fnamemodify(ebname ? '['.id.'*No Name]' : bname, ':.')
-    if bname != expand('%')
-      cal add(bufs[ebname], fname)
-    endif
-  endfo
-  retu join(bufs[0] + bufs[1], "\n")
-endf
-
 map <leader>gt :CtrlPTag<cr>
 map <leader>f :CtrlP .<cr>
 map <leader>F :CtrlP %%<cr>
@@ -349,3 +318,4 @@ map <leader>c :call RunAllCucumberFeatures()<cr>
 map <leader>w :call RunWipCucumberFeatures()<cr>
 
 let g:airline#extensions#tabline#enabled = 1
+let g:airline_powerline_fonts = 1
