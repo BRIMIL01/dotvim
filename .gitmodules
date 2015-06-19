@@ -31,9 +31,6 @@
 [submodule "bundle/vim-surround"]
 	path = bundle/vim-surround
 	url = git://github.com/tpope/vim-surround.git
-[submodule "bundle/AnsiEsc.vim"]
-	path = bundle/AnsiEsc.vim
-	url = git://github.com/vim-scripts/AnsiEsc.vim.git
 [submodule "bundle/vim-ruby"]
 	path = bundle/vim-ruby
 	url = git://github.com/vim-ruby/vim-ruby.git
@@ -45,7 +42,7 @@
 	url = git://github.com/cyphactor/vim-test-recall.git
 [submodule "bundle/vim-open-alternate"]
 	path = bundle/vim-open-alternate
-	url = git://github.com/cyphactor/vim-open-alternate.git
+	url = git@github.com:cyphactor/vim-open-alternate.git
 [submodule "bundle/vim-ping-cursor"]
 	path = bundle/vim-ping-cursor
 	url = git://github.com/cyphactor/vim-ping-cursor.git
@@ -64,9 +61,6 @@
 [submodule "bundle/vim-bundler"]
 	path = bundle/vim-bundler
 	url = git@github.com:tpope/vim-bundler.git
-[submodule "bundle/vim-rake"]
-	path = bundle/vim-rake
-	url = git@github.com:tpope/vim-rake.git
 [submodule "bundle/vim-textobj-user"]
 	path = bundle/vim-textobj-user
 	url = git@github.com:kana/vim-textobj-user.git
@@ -100,3 +94,12 @@
 [submodule "bundle/vim-coffee-script"]
 	path = bundle/vim-coffee-script
 	url = git@github.com:kchmck/vim-coffee-script.git
+[submodule "bundle/vim-scala"]
+	path = bundle/vim-scala
+	url = git@github.com:derekwyatt/vim-scala.git
+[submodule "bundle/vim-tmux-navigator"]
+	path = bundle/vim-tmux-navigator
+	url = git@github.com:christoomey/vim-tmux-navigator.git
+[submodule "bundle/vim-tmux-runner"]
+	path = bundle/vim-tmux-runner
+	url = git@github.com:christoomey/vim-tmux-runner.git

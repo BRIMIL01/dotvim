@@ -30,7 +30,9 @@ set ruler
 " regexp engine does NOT play nice with Ruby lang syntax highlighting.
 " Switching to the older non NFA regexp engine drastically increases
 " performance.
-set regexpengine=1
+if exists('+regexpengine')
+  set regexpengine=1
+endif
 
 " keep buffers opened in background until :q or :q!
 set hidden
@@ -74,7 +76,7 @@ set ignorecase smartcase
 " set cursorcolumn
 
 " Make the command entry area consume two rows
-set cmdheight=2
+set cmdheight=1
 
 " Set preference for switching butters, :help switchbuf for details
 set switchbuf=useopen
@@ -115,29 +117,35 @@ set backspace=indent,eol,start
 " show incomplete command
 set showcmd
 
-" allow backspacing over everything in insert mode
-set backspace=indent,eol,start
-
 " enable syntax
 syntax on
 
-" enable automatic code folder on indent
-set foldmethod=syntax
-
-" do NOT fold by default
-set nofoldenable
-
-" number of levels to auto fold when open a file
-set foldlevel=1
+" Commented these out because they impact performance of opening a file for
+" editing slightly. So, I at least want to keep them out until I find the
+" major performance issue with opening a file for editing.
+" " enable automatic code folder on indent
+" set foldmethod=syntax
+" 
+" " do NOT fold by default
+" set nofoldenable
+" 
+" " number of levels to auto fold when open a file
+" set foldlevel=1
 
 " Set my leader key to be a comma
 let mapleader = ","
 
-" Enable file type detection.
-" " Use the default filetype settings, so that mail gets 'tw' set to 72,
-" " 'cindent' is on in C files, etc.
-" " Also load indent files, to automatically do language-dependent indenting.
-filetype plugin indent on
+" Note: The following command seriously tanks performance of
+" opening at least ruby files for editing. The bundle/vim-rake plugin also
+" triggers `filetype plugin on` which also tanks performance of opening at
+" least ruby files for editing.
+if has("autocmd")
+  " Enable file type detection.
+  " Use the default filetype settings, so that mail gets 'tw' set to 72,
+  " 'cindent' is on in C files, etc.
+  " Also load indent files, to automatically do language-dependent indenting.
+  filetype plugin indent on
+endif
 
 " tab completion mode for files, etc.
 set wildmode=list:longest,list:full
@@ -153,11 +161,15 @@ set completeopt=menu,preview
 set wildmenu
 
 " set ack.vim to use ag instead of ack
-let g:ackprg = 'ag --nogroup --nocolor --column'
+let g:ackprg = 'ag --nogroup --nocolor --column --vimgrep'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CUSTOM AUTOCMDS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" automatically rebalance windows on vim resize
+autocmd VimResized * :wincmd =
+
 augroup vimrcEx
   " Clear all autocmds in the group
   autocmd!
@@ -239,6 +251,21 @@ nnoremap <c-k> <c-w>k
 nnoremap <c-h> <c-w>h
 nnoremap <c-l> <c-w>l
 
+nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
+nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
+nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
+nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
+nnoremap <silent> <c-\> :TmuxNavigatePrevious<cr>
+
+" zoom a vim split, <leader>= to re-balance
+nnoremap <leader>- :wincmd _<cr>:wincmd \|<cr>
+nnoremap <leader>= :wincmd =<cr>
+
+" Insert a hash rocket with <c-l>
+imap <c-l> <space>=><space>
+
+"imap <c-n> <%<space><space>%><esc>bhi
+"imap <c-r> <%=<space><space>%><esc>bhi
 " Can't be bothered to understand ESC vs <c-c> in insert mode
 imap <c-c> <esc>
 " Clear the search buffer when hitting return
@@ -253,23 +280,72 @@ map <leader>P :set paste<CR>^"+P:set nopaste<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " MAPS TO JUMP TO SPECIFIC TARGETS AND FILES
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-map <leader>gt :CtrlPTag<cr>
-map <leader>f :CtrlP .<cr>
-map <leader>F :CtrlP %%<cr>
-map <leader>b :CtrlPBuffer<cr>
+" map <leader>gt :CtrlPTag<cr>
+" map <leader>f :CtrlP .<cr>
+" map <leader>F :CtrlP %%<cr>
+" map <leader>b :CtrlPBuffer<cr>
 
-" jump to buffer if already open, even if in another tab
-let g:ctrlp_switch_buffer = 2
-" set the local working directory to the nearest .git/ .hg/ .svn/ .bzr/
-let g:ctrlp_working_path_mode = 2
-" enable cross-session caching by not deleting cache files on exit
-let g:ctrlp_clear_cache_on_exit = 0
-" set the best match to be the top
-let g:ctrlp_match_window_reversed = 0
-" set max height of match window
-let g:ctrlp_max_height = 20
-" tell ctrlp to ignore some files
-let g:ctrlp_custom_ignore = 'tags$\|\.DS_Store$\|\.git$\|_site$'
+function! SelectaCommand(choice_command, selecta_args, vim_command)
+  try
+    let selection = system(a:choice_command . " | ~/.vim/bin/selecta " . a:selecta_args)
+  catch /Vim:Interrupt/
+    " Swallow the ^C so that the redraw below happens; otherwise there will be
+    " leftovers from selecta on the screen
+    redraw!
+    return
+  endtry
+  redraw!
+  exec a:vim_command . " " . selection
+endfunction
+
+" Find all tags in the tags database, then open the tag that the user selects
+command! SelectaTag :call SelectaCommand("awk '{print $1}' tags | sort -u | grep -v '^!'", "", ":tag")
+
+fu! GetBuffers()
+	let ids = filter(range(1, bufnr('$')), 'empty(getbufvar(v:val, "&bt"))'
+		\ .' && getbufvar(v:val, "&bl")')
+  let bufs = [[], []]
+  for id in ids
+    let bname = bufname(id)
+    let ebname = bname == ''
+    let fname = fnamemodify(ebname ? '['.id.'*No Name]' : bname, ':.')
+    if bname != expand('%')
+      cal add(bufs[ebname], fname)
+    endif
+  endfo
+  retu join(bufs[0] + bufs[1], "\n")
+endf
+
+map <leader>gr :topleft :split config/routes.rb<cr>
+function! ShowRoutes()
+  " Requires 'scratch' plugin
+  :topleft 100 :split __Routes__
+  " Make sure Vim doesn't write __Routes__ as a file
+  :set buftype=nofile
+  " Delete everything
+  :normal 1GdG
+  " Put routes output in buffer
+  :0r! rake -s routes
+  " Size window to number of lines (1 plus rake output length)
+  :exec ":normal " . line("$") . _ "
+  " Move cursor to bottom
+  :normal 1GG
+  " Delete empty trailing line
+  :normal dd
+endfunction
+map <leader>gR :call ShowRoutes()<cr>
+map <leader>gg :topleft 100 :split Gemfile<cr>
+
+map <leader>b :call SelectaCommand("echo '" . GetBuffers() . "'", "", ":buffer")<cr>
+map <leader>gv :call SelectaCommand("find app/views -type f", "", ":e")<cr>
+map <leader>gm :call SelectaCommand("find app/models -type f", "", ":e")<cr>
+map <leader>gh :call SelectaCommand("find app/helpers -type f", "", ":e")<cr>
+map <leader>gl :call SelectaCommand("find lib -type f", "", ":e")<cr>
+map <leader>gf :call SelectaCommand("find features -type f", "", ":e")<cr>
+
+" fuzzy-match files except for stuff in tmp/*, log/*, tags
+map <leader>f :call SelectaCommand("find . -path tags -prune -or -path ./tmp -prune -or -path ./log -prune -or -path ./.git -prune -or -path ./" . expand('%') . " -prune -or -type f -print", "", ":e")<cr>
+map <leader>gt :SelectaTag<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " GIT SHORTCUTS
