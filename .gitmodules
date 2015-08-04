@@ -103,3 +103,9 @@
 [submodule "bundle/vim-tmux-runner"]
 	path = bundle/vim-tmux-runner
 	url = git@github.com:christoomey/vim-tmux-runner.git
+[submodule "bundle/vim-webdevicons"]
+	path = bundle/vim-webdevicons
+	url = git@github.com:ryanoasis/vim-devicons.git
+[submodule "bundle/AnsiEsc.vim"]
+	path = bundle/AnsiEsc.vim
+	url = git@github.com:vim-scripts/AnsiEsc.vim.git
