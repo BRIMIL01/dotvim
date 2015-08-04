@@ -14,6 +14,8 @@ call pathogen#infect()
 " Set the visual bell instead of audible
 set vb
 
+set encoding=utf8
+
 " Set the font when using MacVim.app, this is ignored for console vim as it
 " simply uses the console font.
 set gfn=Monaco:h15
@@ -395,3 +397,4 @@ map <leader>w :call RunWipCucumberFeatures()<cr>
 
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_powerline_fonts = 1
+set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Plus\ Nerd\ File\ Types:h11
