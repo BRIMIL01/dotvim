@@ -112,3 +112,6 @@
 [submodule "bundle/clever-f.vim"]
 	path = bundle/clever-f.vim
 	url = git@github.com:rhysd/clever-f.vim.git
+[submodule "bundle/vim-airline-themes"]
+	path = bundle/vim-airline-themes
+	url = https://github.com/vim-airline/vim-airline-themes
