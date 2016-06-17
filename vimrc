@@ -385,8 +385,19 @@ function! RenameFile()
 endfunction
 map <leader>n :call RenameFile()<cr>
 
-" Alternate between test files and paired code files
-nnoremap <leader>. :OpenAlternate<cr>
+" Run a given vim command on the results of alt from a given path.
+" See usage below.
+function! AltCommand(path, vim_command)
+  let l:alternate = system("~/bin/alt " . a:path)
+  if empty(l:alternate)
+    echo "No alternate file for " . a:path . " exists!"
+  else
+    exec a:vim_command . " " . l:alternate
+  endif
+endfunction
+
+" Find the alternate file for the current path and open it
+nnoremap <leader>. :w<cr>:call AltCommand(expand('%'), ':e')<cr>
 
 " Map all the run test calls provided by vim-test-recall
 map <leader>t :call RunAllTestsInCurrentTestFile()<cr>
@@ -397,4 +408,21 @@ map <leader>w :call RunWipCucumberFeatures()<cr>
 
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_powerline_fonts = 1
+set laststatus=2
 set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Plus\ Nerd\ File\ Types:h11
+
+function RangerExplorer()
+    exec "silent !ranger --choosefile=/tmp/vim_ranger_current_file " . expand("%:p:h")
+    if filereadable('/tmp/vim_ranger_current_file')
+        exec 'edit ' . system('cat /tmp/vim_ranger_current_file')
+        call system('rm /tmp/vim_ranger_current_file')
+    endif
+    redraw!
+endfun
+map <Leader>x :call RangerExplorer()<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Rubocop Conifg
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:vimrubocop_keymap = 0
+nmap <Leader>r :RuboCop<CR>
