@@ -109,6 +109,9 @@
 [submodule "bundle/AnsiEsc.vim"]
 	path = bundle/AnsiEsc.vim
 	url = git@github.com:vim-scripts/AnsiEsc.vim.git
+[submodule "bundle/vim-rake"]
+	path = bundle/vim-rake
+	url = git@github.com:tpope/vim-rake.git
 [submodule "bundle/clever-f.vim"]
 	path = bundle/clever-f.vim
 	url = git@github.com:rhysd/clever-f.vim.git
@@ -118,3 +121,6 @@
 [submodule "bundle/rust.vim"]
 	path = bundle/rust.vim
 	url = git@github.com:rust-lang/rust.vim.git
+[submodule "bundle/dash.vim"]
+	path = bundle/dash.vim
+	url = https://github.com/rizzatti/dash.vim.git

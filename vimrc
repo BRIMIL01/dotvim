@@ -60,7 +60,7 @@ set autoindent
 " Show matching bracket when a bracket is inserted
 set showmatch
 
-" Show matching pattern as typing search pattern 
+" Show matching pattern as typing search pattern
 set incsearch
 
 " Highlight searches matching the search pattern
@@ -127,10 +127,10 @@ syntax on
 " major performance issue with opening a file for editing.
 " " enable automatic code folder on indent
 " set foldmethod=syntax
-" 
+"
 " " do NOT fold by default
 " set nofoldenable
-" 
+"
 " " number of levels to auto fold when open a file
 " set foldlevel=1
 
@@ -178,9 +178,9 @@ augroup vimrcEx
   autocmd FileType text setlocal textwidth=78
   " Jump to last cursor position unless it's invalid or in an event handler
   autocmd BufReadPost *
-    \ if line("'\"") > 0 && line("'\"") <= line("$") |
-    \   exe "normal g`\"" |
-    \ endif
+        \ if line("'\"") > 0 && line("'\"") <= line("$") |
+        \   exe "normal g`\"" |
+        \ endif
 
   "for ruby, autoindent with two spaces, always expand tabs
   autocmd FileType ruby,haml,eruby,yaml,html,javascript,sass,cucumber set ai sw=2 sts=2 et
@@ -192,10 +192,10 @@ augroup vimrcEx
 
   autocmd BufRead *.mkd  set ai formatoptions=tcroqn2 comments=n:&gt;
   autocmd BufRead *.markdown  set ai formatoptions=tcroqn2 comments=n:&gt;
-  
+
   " Enable syntax highlighting for all spec files
   " http://stackoverflow.com/questions/8848896/why-do-i-get-syntax-highlighting-for-rspec-only-in-some-projects-in-vim
-  autocmd BufRead *_spec.rb syn keyword rubyRspec describe context it specify it_should_behave_like before after setup subject its shared_examples_for shared_context let 
+  autocmd BufRead *_spec.rb syn keyword rubyRspec describe context it specify it_should_behave_like before after setup subject its shared_examples_for shared_context let
   highlight def link rubyRspec Function
 
   " Before writing a file check if the path for it exists. If it doesn't then
@@ -215,7 +215,7 @@ augroup vimrcEx
   " Don't screw up folds when inserting text that might affect them, until
   " " leaving insert mode. Foldmethod is local to the window. Protect against
   " " screwing up folding when switching between windows.
-  " 
+  "
   " Note: I added the following because I was seeing very bad performance when
   " using Ctrl+n or Ctrl+p or Ctrl+x Ctrl+o to do wordcompletion. I did
   " googling and found out it was due to the foldmethod=syntax and that there
@@ -304,8 +304,8 @@ endfunction
 command! SelectaTag :call SelectaCommand("awk '{print $1}' tags | sort -u | grep -v '^!'", "", ":tag")
 
 fu! GetBuffers()
-	let ids = filter(range(1, bufnr('$')), 'empty(getbufvar(v:val, "&bt"))'
-		\ .' && getbufvar(v:val, "&bl")')
+  let ids = filter(range(1, bufnr('$')), 'empty(getbufvar(v:val, "&bt"))'
+        \ .' && getbufvar(v:val, "&bl")')
   let bufs = [[], []]
   for id in ids
     let bname = bufname(id)
@@ -375,13 +375,13 @@ map <leader>v :view %%
 " RENAME CURRENT FILE
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! RenameFile()
-    let old_name = expand('%')
-    let new_name = input('New file name: ', expand('%'), 'file')
-    if new_name != '' && new_name != old_name
-        exec ':saveas ' . new_name
-        exec ':silent !rm ' . old_name
-        redraw!
-    endif
+  let old_name = expand('%')
+  let new_name = input('New file name: ', expand('%'), 'file')
+  if new_name != '' && new_name != old_name
+    exec ':saveas ' . new_name
+    exec ':silent !rm ' . old_name
+    redraw!
+  endif
 endfunction
 map <leader>n :call RenameFile()<cr>
 
@@ -412,12 +412,12 @@ set laststatus=2
 set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Plus\ Nerd\ File\ Types:h11
 
 function RangerExplorer()
-    exec "silent !ranger --choosefile=/tmp/vim_ranger_current_file " . expand("%:p:h")
-    if filereadable('/tmp/vim_ranger_current_file')
-        exec 'edit ' . system('cat /tmp/vim_ranger_current_file')
-        call system('rm /tmp/vim_ranger_current_file')
-    endif
-    redraw!
+  exec "silent !ranger --choosefile=/tmp/vim_ranger_current_file " . expand("%:p:h")
+  if filereadable('/tmp/vim_ranger_current_file')
+    exec 'edit ' . system('cat /tmp/vim_ranger_current_file')
+    call system('rm /tmp/vim_ranger_current_file')
+  endif
+  redraw!
 endfun
 map <Leader>x :call RangerExplorer()<CR>
 
